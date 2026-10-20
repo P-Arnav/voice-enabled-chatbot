@@ -19,7 +19,7 @@ from docx.shared import Inches, Pt, RGBColor
 
 NAME = "Arnav Panwar"
 REG_NO = "23BAI0147"
-LIVE_URL = "LIVE_URL_PENDING"
+LIVE_URL = "https://voice-enabled-chatbot.streamlit.app/"
 REPO_URL = "https://github.com/P-Arnav/voice-enabled-chatbot"
 MODEL_URL = "https://huggingface.co/Xyphitos/distilbert-clinc25-intent"
 OUT_FILE = "../Voice_Chatbot_Lab_Assessment.docx"
@@ -258,8 +258,8 @@ para("Whisper's few errors were mostly punctuation, casing and rare words (for e
 
 doc.add_heading("6.3 Deployed application", level=2)
 if os.path.exists("figures/app_screenshot.png"):
-    figure("figures/app_screenshot.png", "Figure 4: The deployed application showing the "
-           "recognized speech, detected intent and chatbot response.", width=6.3)
+    figure("figures/app_screenshot.png", "Figure 4: The live application at " + LIVE_URL +
+           " after two queries (typed here; spoken queries fill the same panels).", width=5.6)
 else:
     para("[Screenshot of the live application to be inserted]")
 

@@ -2,7 +2,7 @@
 
 Speech recognition + deep learning chatbot, deployed on Streamlit Community Cloud.
 
-**Live app:** LIVE_URL
+**Live app:** https://voice-enabled-chatbot.streamlit.app/
 
 ## How it works
 
