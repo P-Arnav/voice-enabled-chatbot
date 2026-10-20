@@ -1,0 +1,90 @@
+======================================================================
+STEP 1: Load CLINC150 and build the 26-class dataset
+======================================================================
+Classes        : 26 (25 intents + oos)
+Train examples : 4100  (oos = 1600)
+Val examples   : 900
+Test examples  : 1750  (in-scope 750, CLINC oos 1000)
+Sample rows    :
+   definition           | find the meaning of qat
+   where_are_you_from   | where is your home located
+   oos                  | can you tell me what song this is
+   oos                  | check my reminders for mop the floor
+   goodbye              | it was nice to get in touch
+
+======================================================================
+STEP 2: Tokenise and build the vocabulary
+======================================================================
+Vocabulary size      : 2722
+Utterance length     : mean 7.1, max 22 tokens
+Padded/truncated to  : 25 tokens
+Example encoding     : 'find the meaning of qat'
+                       [101, 5, 50, 12, 531, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+======================================================================
+STEP 3: Build the BiLSTM model
+======================================================================
+IntentClassifier(
+  (embedding): Embedding(2722, 100, padding_idx=0)
+  (lstm): LSTM(100, 128, batch_first=True, bidirectional=True)
+  (dropout): Dropout(p=0.3, inplace=False)
+  (fc): Linear(in_features=256, out_features=26, bias=True)
+)
+Trainable parameters: 514,402
+
+======================================================================
+STEP 4: Train (Adam, lr=1e-3, batch 64, 20 epochs, weighted CE, keep best val)
+======================================================================
+Epoch  1/20 | loss 2.8747 acc 0.3983 | val_loss 2.3327 val_acc 0.4733  <- best
+Epoch  2/20 | loss 1.5009 acc 0.6768 | val_loss 1.1754 val_acc 0.7300  <- best
+Epoch  3/20 | loss 0.7273 acc 0.7963 | val_loss 0.8250 val_acc 0.7989  <- best
+Epoch  4/20 | loss 0.4356 acc 0.8578 | val_loss 0.6712 val_acc 0.8022  <- best
+Epoch  5/20 | loss 0.2900 acc 0.9020 | val_loss 0.6107 val_acc 0.8500  <- best
+Epoch  6/20 | loss 0.2016 acc 0.9302 | val_loss 0.5506 val_acc 0.8411
+Epoch  7/20 | loss 0.1432 acc 0.9473 | val_loss 0.5140 val_acc 0.8600  <- best
+Epoch  8/20 | loss 0.1085 acc 0.9624 | val_loss 0.4894 val_acc 0.8622  <- best
+Epoch  9/20 | loss 0.0785 acc 0.9676 | val_loss 0.4915 val_acc 0.8733  <- best
+Epoch 10/20 | loss 0.0598 acc 0.9788 | val_loss 0.4963 val_acc 0.8811  <- best
+Epoch 11/20 | loss 0.0503 acc 0.9820 | val_loss 0.4859 val_acc 0.8756
+Epoch 12/20 | loss 0.0439 acc 0.9829 | val_loss 0.4949 val_acc 0.8833  <- best
+Epoch 13/20 | loss 0.0345 acc 0.9885 | val_loss 0.5189 val_acc 0.8822
+Epoch 14/20 | loss 0.0413 acc 0.9876 | val_loss 0.5259 val_acc 0.8811
+Epoch 15/20 | loss 0.0268 acc 0.9893 | val_loss 0.5085 val_acc 0.8833
+Epoch 16/20 | loss 0.0206 acc 0.9917 | val_loss 0.4965 val_acc 0.8944  <- best
+Epoch 17/20 | loss 0.0169 acc 0.9941 | val_loss 0.5163 val_acc 0.8822
+Epoch 18/20 | loss 0.0151 acc 0.9956 | val_loss 0.4979 val_acc 0.8889
+Epoch 19/20 | loss 0.0133 acc 0.9941 | val_loss 0.5126 val_acc 0.8911
+Epoch 20/20 | loss 0.0129 acc 0.9949 | val_loss 0.4997 val_acc 0.8944
+Training time: 10.2 s | best val_acc 0.8944 at epoch 16
+Saved model -> model/intent_bilstm.pt (2.1 MB)
+
+======================================================================
+STEP 5: Evaluate on the CLINC150 test set
+======================================================================
+BiLSTM (argmax)                    overall 0.9257 | in-scope 0.8800 | oos recall 0.9600 | macro-F1 0.8825
+BiLSTM (+ conf threshold 0.5)      overall 0.9269 | in-scope 0.8667 | oos recall 0.9720 | macro-F1 0.8907
+Baseline: TF-IDF + LogReg          overall 0.9160 | in-scope 0.9093 | oos recall 0.9210 | macro-F1 0.8927
+
+Sample predictions:
+   'tell me a joke about elephants'
+      gold=tell_joke          pred=tell_joke          conf=0.99
+   'can you delete my saved credit card'
+      gold=oos                pred=oos                conf=1.00
+   'make a list of what materials have been used for spacesuits'
+      gold=oos                pred=oos                conf=0.99
+   'that would be correct'
+      gold=yes                pred=yes                conf=0.99
+   'where did you grow up'
+      gold=where_are_you_from pred=how_old_are_you    conf=0.62
+   'clear my search history'
+      gold=oos                pred=oos                conf=0.99
+   'can you find the answer to number 26 in this algebra two textbook'
+      gold=oos                pred=oos                conf=1.00
+   'how old is jennifer aniston'
+      gold=oos                pred=oos                conf=0.73
+
+======================================================================
+STEP 6: Save figures and results
+======================================================================
+Saved figures/training_curves.png, figures/confusion_matrix.png
+Saved results.json

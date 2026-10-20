@@ -1,0 +1,53 @@
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+W1020 17:47:39.474000 10348 torch\distributed\elastic\multiprocessing\redirects.py:29] NOTE: Redirects are currently not supported in Windows or MacOs.
+To support symlinks on Windows, you either need to activate Developer Mode or to run Python as an administrator. In order to activate developer mode, see this article: https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development
+======================================================================
+STEP 1: Load CLINC150 and build the 26-class dataset
+======================================================================
+Train 4100 | Val 900 | Test 1750 (in-scope 750, oos 1000)
+
+======================================================================
+STEP 2: Load pretrained DistilBERT (distilbert-base-uncased)
+======================================================================
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]Loading weights:  25%|██▌       | 25/100 [00:00<00:00, 246.10it/s]Loading weights:  76%|███████▌  | 76/100 [00:00<00:00, 387.01it/s]Loading weights: 100%|██████████| 100/100 [00:00<00:00, 469.02it/s]
+[transformers] [1mDistilBertForSequenceClassification LOAD REPORT[0m from: distilbert-base-uncased
+Key                     | Status     | 
+------------------------+------------+-
+vocab_transform.bias    | UNEXPECTED | 
+vocab_layer_norm.weight | UNEXPECTED | 
+vocab_transform.weight  | UNEXPECTED | 
+vocab_projector.bias    | UNEXPECTED | 
+vocab_layer_norm.bias   | UNEXPECTED | 
+classifier.bias         | MISSING    | 
+pre_classifier.weight   | MISSING    | 
+pre_classifier.bias     | MISSING    | 
+classifier.weight       | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+Parameters: 66,973,466   device: cuda
+Tokenised example: ['find', 'the', 'meaning', 'of', 'q', '##at']
+
+======================================================================
+STEP 3: Fine-tune (AdamW, lr=5e-5, batch 32, 4 epochs, linear decay)
+======================================================================
+Epoch 1/4 | train_loss 1.7664 | val_acc 0.9344
+Epoch 2/4 | train_loss 0.3744 | val_acc 0.9589
+Epoch 3/4 | train_loss 0.1320 | val_acc 0.9656
+Epoch 4/4 | train_loss 0.0775 | val_acc 0.9678
+Fine-tuning time: 42.1 s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:01<00:00,  1.58s/it]Writing model shards: 100%|██████████| 1/1 [00:01<00:00,  1.58s/it]
+Saved model -> model/distilbert_intent/
+
+======================================================================
+STEP 4: Evaluate on the CLINC150 test set
+======================================================================
+DistilBERT (+ conf threshold 0.5)  overall 0.9680 | in-scope 0.9507 | oos recall 0.9810 | macro-F1 0.9574
+CPU latency per utterance: 27.1 ms
+
+======================================================================
+STEP 5: Save figures and results
+======================================================================
+Saved figures/distilbert_curves.png, figures/confusion_matrix_distilbert.png
+Saved results_distilbert.json

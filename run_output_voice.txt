@@ -1,0 +1,63 @@
+Loading Whisper ...
+Loading DistilBERT intent model ...
+[transformers] Using custom `forced_decoder_ids` from the (generation) config. This is deprecated in favor of the `task` and `language` flags/config options.
+[transformers] Passing `generation_config` together with generation-related arguments=({'suppress_tokens', 'begin_suppress_tokens'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.
+[transformers] You seem to be using the pipelines sequentially on GPU. In order to maximize efficiency please use a dataset
+======================================================================
+STEP 1: Pick test sentences (2 per intent + 20 out-of-scope)
+======================================================================
+70 sentences (50 in-scope, 20 oos)
+======================================================================
+STEP 2: Synthesise speech with Windows SAPI (David / Zira, 16 kHz WAV)
+======================================================================
+Saved 70 clips to data/voice_test/
+======================================================================
+STEP 3: Whisper transcription + DistilBERT intent prediction
+======================================================================
+[OK ] said : will you tell me how the ai is doing
+      heard: Will you tell me how the AI is doing?
+      gold=greeting  pred(voice)=greeting
+[OK ] said : affirmative
+      heard: Affirmative.
+      gold=yes  pred(voice)=yes
+[OK ] said : what's the current time
+      heard: What's the current time?
+      gold=time  pred(voice)=time
+[OK ] said : flip the coin, i choose heads
+      heard: Flip the coin. I choose heads.
+      gold=flip_coin  pred(voice)=flip_coin
+[OK ] said : please explain the word catastrophic to me
+      heard: Please explain the word catastrophic to me.
+      gold=definition  pred(voice)=definition
+[OK ] said : what do you know about the meaning of life
+      heard: What do you know about the meaning of life?
+      gold=meaning_of_life  pred(voice)=meaning_of_life
+[OK ] said : your date of birth
+      heard: Your date of birth
+      gold=how_old_are_you  pred(voice)=how_old_are_you
+[ERR] said : what are you programmed to do for me
+      heard: What are you programmed to do for me?
+      gold=what_can_i_ask_you  pred(voice)=who_made_you
+[OK ] said : what kinds of activities to you participate in during your free time
+      heard: What kinds of activities do you participate in during your free time?
+      gold=what_are_your_hobbies  pred(voice)=what_are_your_hobbies
+[OK ] said : am i in charge of you
+      heard: Am I in charge of you?
+      gold=who_do_you_work_for  pred(voice)=who_do_you_work_for
+[OK ] said : where did i last place my remote
+      heard: Where did I last place my remote?
+      gold=oos  pred(voice)=oos
+[OK ] said : what are the best personal finance practices
+      heard: What are the best personal finance practices?
+      gold=oos  pred(voice)=oos
+[OK ] said : what is happening in politicsu
+      heard: What is happening in Politiksoo?
+      gold=oos  pred(voice)=oos
+======================================================================
+RESULTS
+======================================================================
+Whisper WER                     : 4.47 %
+Intent accuracy (typed text)    : 98.57 %
+Intent accuracy (voice, end2end): 98.57 %
+ASR time per clip               : 0.39 s
+Saved results_voice.json
